@@ -288,117 +288,281 @@ def hapus_transaksi(id):
 @app.route('/unduh')
 def unduh():
     try:
-        # Buat workbook baru
         wb = Workbook()
         ws = wb.active
         ws.title = "Laporan Keuangan"
 
-        # Definisikan style
-        header_style = {
-            'fill': PatternFill(start_color='366092', end_color='366092', fill_type='solid'),
-            'font': Font(bold=True, color='FFFFFF'),
+        # Modern Color Scheme
+        colors = {
+            'primary': '6366F1',      # Indigo
+            'secondary': '4F46E5',    # Darker Indigo
+            'success': '22C55E',      # Green
+            'danger': 'EF4444',       # Red
+            'warning': 'F59E0B',      # Amber
+            'info': '3B82F6',         # Blue
+            'light': 'F3F4F6',        # Gray-100
+            'dark': '1F2937',         # Gray-800
+            'white': 'FFFFFF',
+            'border': 'E5E7EB'        # Gray-200
+        }
+
+        # Enhanced Styles
+        title_style = {
+            'font': Font(name='Segoe UI', size=20, bold=True, color=colors['dark']),
+            'fill': PatternFill(start_color=colors['light'], end_color=colors['light'], fill_type='solid'),
+            'alignment': Alignment(horizontal='center', vertical='center'),
             'border': Border(
-                left=Side(style='thin'),
-                right=Side(style='thin'),
-                top=Side(style='thin'),
-                bottom=Side(style='thin')
-            ),
+                bottom=Side(style='medium', color=colors['primary'])
+            )
+        }
+
+        subtitle_style = {
+            'font': Font(name='Segoe UI', size=11, color=colors['dark']),
             'alignment': Alignment(horizontal='center', vertical='center')
         }
 
-        data_style = {
+        header_style = {
+            'font': Font(name='Segoe UI', size=11, bold=True, color=colors['white']),
+            'fill': PatternFill(start_color=colors['primary'], end_color=colors['secondary'], fill_type='solid'),
+            'alignment': Alignment(horizontal='center', vertical='center'),
             'border': Border(
-                left=Side(style='thin'),
-                right=Side(style='thin'),
-                top=Side(style='thin'),
-                bottom=Side(style='thin')
-            ),
-            'alignment': Alignment(horizontal='left', vertical='center')
+                left=Side(style='thin', color=colors['border']),
+                right=Side(style='thin', color=colors['border']),
+                top=Side(style='thin', color=colors['border']),
+                bottom=Side(style='thin', color=colors['border'])
+            )
+        }
+
+        data_style = {
+            'font': Font(name='Segoe UI', size=10),
+            'alignment': Alignment(vertical='center'),
+            'border': Border(
+                left=Side(style='thin', color=colors['border']),
+                right=Side(style='thin', color=colors['border']),
+                top=Side(style='thin', color=colors['border']),
+                bottom=Side(style='thin', color=colors['border'])
+            )
         }
 
         amount_style = {
-            'border': Border(
-                left=Side(style='thin'),
-                right=Side(style='thin'),
-                top=Side(style='thin'),
-                bottom=Side(style='thin')
-            ),
+            'font': Font(name='Segoe UI', size=10),
             'alignment': Alignment(horizontal='right', vertical='center'),
-            'number_format': '#,##0'
+            'border': Border(
+                left=Side(style='thin', color=colors['border']),
+                right=Side(style='thin', color=colors['border']),
+                top=Side(style='thin', color=colors['border']),
+                bottom=Side(style='thin', color=colors['border'])
+            ),
+            'number_format': '_-* #,##0_-;[Red]-* #,##0_-;_-* "-"_-;_-@_-'
         }
 
-        # Set lebar kolom
-        ws.column_dimensions['A'].width = 15  # Tanggal
-        ws.column_dimensions['B'].width = 15  # Jenis
-        ws.column_dimensions['C'].width = 20  # Kategori
-        ws.column_dimensions['D'].width = 20  # Jumlah
-        ws.column_dimensions['E'].width = 40  # Keterangan
+        summary_header_style = {
+            'font': Font(name='Segoe UI', size=12, bold=True, color=colors['white']),
+            'fill': PatternFill(start_color=colors['secondary'], end_color=colors['secondary'], fill_type='solid'),
+            'alignment': Alignment(horizontal='center', vertical='center'),
+            'border': Border(
+                left=Side(style='thin', color=colors['border']),
+                right=Side(style='thin', color=colors['border']),
+                top=Side(style='thin', color=colors['border']),
+                bottom=Side(style='thin', color=colors['border'])
+            )
+        }
 
-        # Header
-        headers = ['Tanggal', 'Jenis', 'Kategori', 'Jumlah', 'Keterangan']
+        # Set column widths
+        column_widths = {
+            'A': 6,   # No
+            'B': 20,  # Tanggal
+            'C': 15,  # Jenis
+            'D': 25,  # Kategori
+            'E': 20,  # Jumlah
+            'F': 40   # Keterangan
+        }
+        
+        for col, width in column_widths.items():
+            ws.column_dimensions[col].width = width
+
+        # Title Section with Logo/Brand
+        ws.merge_cells('A1:F2')
+        title = ws.cell(row=1, column=1, value="LAPORAN KEUANGAN")
+        for key, value in title_style.items():
+            setattr(title, key, value)
+        ws.row_dimensions[1].height = 50
+
+        # Subtitle with Period
+        ws.merge_cells('A3:F3')
+        period = ws.cell(row=3, column=1, 
+                        value=f"Periode: {datetime.now().strftime('%d %B %Y')}")
+        for key, value in subtitle_style.items():
+            setattr(period, key, value)
+
+        # Add spacing
+        ws.row_dimensions[4].height = 20
+
+        # Headers
+        headers = ['No', 'Tanggal', 'Jenis', 'Kategori', 'Jumlah', 'Keterangan']
         for col, header in enumerate(headers, 1):
-            cell = ws.cell(row=1, column=col, value=header)
-            cell.fill = header_style['fill']
-            cell.font = header_style['font']
-            cell.border = header_style['border']
-            cell.alignment = header_style['alignment']
+            cell = ws.cell(row=5, column=col, value=header)
+            for key, value in header_style.items():
+                setattr(cell, key, value)
+        ws.row_dimensions[5].height = 30
 
         # Data
         transaksi = Transaksi.query.order_by(Transaksi.tanggal.desc()).all()
-        for row, t in enumerate(transaksi, 2):
-            # Tanggal
-            cell = ws.cell(row=row, column=1, value=t.tanggal)
+        kategori_pemasukan = defaultdict(float)
+        kategori_pengeluaran = defaultdict(float)
+        
+        for idx, t in enumerate(transaksi, 1):
+            row = idx + 5
+            
+            # Apply zebra striping
+            fill_color = colors['light'] if idx % 2 == 0 else colors['white']
+            row_style = PatternFill(start_color=fill_color, end_color=fill_color, fill_type='solid')
+            
+            # No
+            cell = ws.cell(row=row, column=1, value=idx)
+            cell.alignment = Alignment(horizontal='center', vertical='center')
+            cell.font = data_style['font']
             cell.border = data_style['border']
-            cell.alignment = data_style['alignment']
-            cell.number_format = 'DD/MM/YYYY HH:MM'
+            cell.fill = row_style
+
+            # Tanggal
+            cell = ws.cell(row=row, column=2, value=t.tanggal)
+            cell.font = data_style['font']
+            cell.border = data_style['border']
+            cell.alignment = Alignment(horizontal='center', vertical='center')
+            cell.number_format = 'dd/mm/yyyy hh:mm'
+            cell.fill = row_style
 
             # Jenis
-            cell = ws.cell(row=row, column=2, value=t.jenis.title())
+            cell = ws.cell(row=row, column=3, value=t.jenis.title())
+            cell.font = Font(name='Segoe UI', size=10, 
+                           color=colors['success'] if t.jenis == 'pemasukan' else colors['danger'])
             cell.border = data_style['border']
-            cell.alignment = data_style['alignment']
-            cell.font = Font(color='008000' if t.jenis == 'pemasukan' else 'FF0000')
+            cell.alignment = Alignment(horizontal='center', vertical='center')
+            cell.fill = row_style
 
             # Kategori
-            cell = ws.cell(row=row, column=3, value=t.kategori)
+            cell = ws.cell(row=row, column=4, value=t.kategori)
+            cell.font = data_style['font']
             cell.border = data_style['border']
             cell.alignment = data_style['alignment']
+            cell.fill = row_style
 
             # Jumlah
-            cell = ws.cell(row=row, column=4, value=t.jumlah)
+            cell = ws.cell(row=row, column=5, value=t.jumlah)
+            cell.font = Font(name='Segoe UI', size=10, 
+                           color=colors['success'] if t.jenis == 'pemasukan' else colors['danger'])
             cell.border = amount_style['border']
             cell.alignment = amount_style['alignment']
             cell.number_format = amount_style['number_format']
-            cell.font = Font(color='008000' if t.jenis == 'pemasukan' else 'FF0000')
+            cell.fill = row_style
 
             # Keterangan
-            cell = ws.cell(row=row, column=5, value=t.keterangan)
+            cell = ws.cell(row=row, column=6, value=t.keterangan)
+            cell.font = data_style['font']
             cell.border = data_style['border']
             cell.alignment = data_style['alignment']
+            cell.fill = row_style
 
-        # Tambah ringkasan di bawah
-        row = len(transaksi) + 3
-        
-        # Total Pemasukan
-        ws.cell(row=row, column=1, value='Total Pemasukan').font = Font(bold=True)
-        total_pemasukan = sum(t.jumlah for t in transaksi if t.jenis == 'pemasukan')
-        cell = ws.cell(row=row, column=4, value=total_pemasukan)
-        cell.font = Font(bold=True, color='008000')
-        cell.number_format = '#,##0'
-        
-        # Total Pengeluaran
-        ws.cell(row=row+1, column=1, value='Total Pengeluaran').font = Font(bold=True)
-        total_pengeluaran = sum(t.jumlah for t in transaksi if t.jenis == 'pengeluaran')
-        cell = ws.cell(row=row+1, column=4, value=total_pengeluaran)
-        cell.font = Font(bold=True, color='FF0000')
-        cell.number_format = '#,##0'
-        
-        # Saldo
-        ws.cell(row=row+2, column=1, value='Saldo').font = Font(bold=True)
-        cell = ws.cell(row=row+2, column=4, value=total_pemasukan - total_pengeluaran)
-        cell.font = Font(bold=True)
-        cell.number_format = '#,##0'
+            # Update kategori totals
+            if t.jenis == 'pemasukan':
+                kategori_pemasukan[t.kategori] += t.jumlah
+            else:
+                kategori_pengeluaran[t.kategori] += t.jumlah
 
-        # Simpan ke BytesIO
+        current_row = len(transaksi) + 7
+
+        # Summary Section
+        ws.merge_cells(f'A{current_row}:F{current_row}')
+        summary_title = ws.cell(row=current_row, column=1, value="RINGKASAN TRANSAKSI")
+        for key, value in summary_header_style.items():
+            setattr(summary_title, key, value)
+        ws.row_dimensions[current_row].height = 30
+
+        current_row += 2
+
+        # Pemasukan Summary
+        ws.cell(row=current_row, column=1, value="PEMASUKAN").font = Font(name='Segoe UI', bold=True, size=11)
+        current_row += 1
+        
+        # Header for pemasukan summary
+        ws.cell(row=current_row, column=2, value="Kategori").font = Font(name='Segoe UI', bold=True, size=10)
+        ws.cell(row=current_row, column=3, value="Jumlah").font = Font(name='Segoe UI', bold=True, size=10)
+        ws.cell(row=current_row, column=4, value="Persentase").font = Font(name='Segoe UI', bold=True, size=10)
+        current_row += 1
+
+        total_pemasukan = sum(kategori_pemasukan.values())
+        
+        for kategori, jumlah in sorted(kategori_pemasukan.items(), key=lambda x: x[1], reverse=True):
+            ws.cell(row=current_row, column=2, value=kategori).font = data_style['font']
+            
+            cell = ws.cell(row=current_row, column=3, value=jumlah)
+            cell.font = Font(name='Segoe UI', size=10, color=colors['success'])
+            cell.number_format = amount_style['number_format']
+            cell.alignment = Alignment(horizontal='right')
+            
+            percentage = (jumlah / total_pemasukan * 100) if total_pemasukan > 0 else 0
+            ws.cell(row=current_row, column=4, 
+                   value=f"{percentage:.1f}%").alignment = Alignment(horizontal='right')
+            
+            current_row += 1
+
+        current_row += 2
+
+        # Pengeluaran Summary
+        ws.cell(row=current_row, column=1, value="PENGELUARAN").font = Font(name='Segoe UI', bold=True, size=11)
+        current_row += 1
+        
+        # Header for pengeluaran summary
+        ws.cell(row=current_row, column=2, value="Kategori").font = Font(name='Segoe UI', bold=True, size=10)
+        ws.cell(row=current_row, column=3, value="Jumlah").font = Font(name='Segoe UI', bold=True, size=10)
+        ws.cell(row=current_row, column=4, value="Persentase").font = Font(name='Segoe UI', bold=True, size=10)
+        current_row += 1
+
+        total_pengeluaran = sum(kategori_pengeluaran.values())
+        
+        for kategori, jumlah in sorted(kategori_pengeluaran.items(), key=lambda x: x[1], reverse=True):
+            ws.cell(row=current_row, column=2, value=kategori).font = data_style['font']
+            
+            cell = ws.cell(row=current_row, column=3, value=jumlah)
+            cell.font = Font(name='Segoe UI', size=10, color=colors['danger'])
+            cell.number_format = amount_style['number_format']
+            cell.alignment = Alignment(horizontal='right')
+            
+            percentage = (jumlah / total_pengeluaran * 100) if total_pengeluaran > 0 else 0
+            ws.cell(row=current_row, column=4, 
+                   value=f"{percentage:.1f}%").alignment = Alignment(horizontal='right')
+            
+            current_row += 1
+
+        current_row += 2
+
+        # Final Summary
+        summary_cells = [
+            ("Total Pemasukan", total_pemasukan, colors['success']),
+            ("Total Pengeluaran", total_pengeluaran, colors['danger']),
+            ("Saldo", total_pemasukan - total_pengeluaran, colors['dark'])
+        ]
+
+        for label, amount, color in summary_cells:
+            ws.cell(row=current_row, column=2, value=label).font = Font(name='Segoe UI', bold=True, size=11)
+            
+            cell = ws.cell(row=current_row, column=3, value=amount)
+            cell.font = Font(name='Segoe UI', bold=True, size=11, color=color)
+            cell.number_format = amount_style['number_format']
+            cell.alignment = Alignment(horizontal='right')
+            
+            current_row += 1
+
+        # Footer
+        current_row += 2
+        ws.merge_cells(f'A{current_row}:F{current_row}')
+        footer = ws.cell(row=current_row, column=1, 
+                        value=f"Laporan ini dibuat pada {datetime.now().strftime('%d %B %Y %H:%M:%S')}")
+        footer.font = Font(name='Segoe UI', size=9, italic=True, color=colors['dark'])
+        footer.alignment = Alignment(horizontal='center')
+
+        # Save
         excel_file = BytesIO()
         wb.save(excel_file)
         excel_file.seek(0)
