@@ -1,0 +1,156 @@
+# Software Requirements Specification (SRS)
+## Aplikasi Manajemen Keuangan Personal
+
+### 1. Pendahuluan
+#### 1.1 Tujuan
+Aplikasi ini bertujuan untuk membantu pengguna mengelola dan memantau keuangan personal dengan cara yang efektif dan efisien.
+
+#### 1.2 Ruang Lingkup
+- Pencatatan pemasukan dan pengeluaran
+- Kategorisasi transaksi
+- Analisis keuangan dengan visualisasi
+- Laporan keuangan dalam format Excel
+- Manajemen data transaksi (CRUD)
+
+### 2. Deskripsi Umum
+#### 2.1 Perspektif Produk
+Aplikasi berbasis web yang dapat diakses melalui browser dengan tampilan responsif untuk desktop dan mobile.
+
+#### 2.2 Fungsi Produk
+1. Manajemen Transaksi
+   - Menambah transaksi baru
+   - Mengedit transaksi
+   - Menghapus transaksi
+   - Melihat daftar transaksi
+
+2. Analisis Keuangan
+   - Dashboard dengan ringkasan keuangan
+   - Grafik tren pemasukan dan pengeluaran
+   - Analisis per kategori
+   - Filter berdasarkan periode
+
+3. Laporan
+   - Ekspor data ke Excel
+   - Ringkasan kategori
+   - Analisis persentase
+   - Format yang rapi dan profesional
+
+### 3. Kebutuhan Spesifik
+#### 3.1 Kebutuhan Fungsional
+
+1. Manajemen Transaksi
+   - Input data transaksi (tanggal, jenis, kategori, jumlah, keterangan)
+   - Edit data transaksi yang sudah ada
+   - Hapus transaksi
+   - Tampilkan daftar transaksi dengan pagination
+
+2. Dashboard
+   - Tampilkan total pemasukan dan pengeluaran
+   - Tampilkan saldo terkini
+   - Grafik tren bulanan
+   - Grafik distribusi kategori
+
+3. Filter dan Pencarian
+   - Filter berdasarkan periode (hari, minggu, bulan)
+   - Filter berdasarkan rentang tanggal
+   - Filter berdasarkan kategori
+
+4. Laporan
+   - Ekspor ke Excel dengan format profesional
+   - Ringkasan per kategori
+   - Analisis persentase
+   - Tampilan yang rapi dan mudah dibaca
+
+#### 3.2 Kebutuhan Non-Fungsional
+
+1. Performa
+   - Waktu loading maksimal 3 detik
+   - Responsif untuk semua ukuran layar
+   - Optimasi database
+
+2. Keamanan
+   - Validasi input
+   - Sanitasi data
+   - Proteksi terhadap SQL injection
+
+3. Usability
+   - Interface yang intuitif
+   - Navigasi yang mudah
+   - Feedback yang jelas untuk setiap aksi
+   - Responsif di mobile dan desktop
+
+4. Reliabilitas
+   - Backup data otomatis
+   - Error handling yang baik
+   - Validasi data
+
+### 4. Teknologi yang Digunakan
+
+1. Backend
+   - Python Flask
+   - SQLAlchemy ORM
+   - PostgreSQL/SQLite Database
+
+2. Frontend
+   - HTML5
+   - CSS3 (Bootstrap 5)
+   - JavaScript
+   - Chart.js untuk visualisasi
+
+3. Tools
+   - Git untuk version control
+   - Vercel untuk deployment
+   - OpenpyXL untuk ekspor Excel
+
+### 5. Database Design
+
+1. Tabel Transaksi
+   - id (Primary Key)
+   - tanggal (DateTime)
+   - jenis (String)
+   - kategori (String)
+   - jumlah (Float)
+   - keterangan (String)
+
+### 6. Interface Design
+
+1. Halaman Utama (Dashboard)
+   - Header dengan judul aplikasi
+   - Ringkasan saldo, pemasukan, pengeluaran
+   - Grafik tren keuangan
+   - Grafik kategori
+   - Filter periode
+
+2. Halaman Transaksi
+   - Form input transaksi
+   - Tabel daftar transaksi
+   - Opsi edit dan hapus
+   - Pagination
+
+3. Komponen Mobile
+   - Navbar responsif
+   - Filter slide-in dari kanan
+   - Bottom navigation
+   - Optimasi tampilan grafik
+
+### 7. Deployment
+
+1. Hosting
+   - Deployment di Vercel
+   - Konfigurasi environment variables
+   - Setup database PostgreSQL
+
+2. Maintenance
+   - Backup database berkala
+   - Monitoring performa
+   - Update dependencies
+
+### 8. Future Development
+
+1. Fitur yang Direncanakan
+   - Multi-user support
+   - Kategori custom
+   - Budget planning
+   - Notifikasi
+   - Export PDF
+   - Import data
