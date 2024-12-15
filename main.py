@@ -2,30 +2,16 @@ from flask import Flask, render_template, request, redirect, url_for, flash, sen
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime, timedelta
 from collections import defaultdict
+
 from sqlalchemy import and_
 from openpyxl import Workbook
 from openpyxl.styles import PatternFill, Border, Side, Alignment, Font
 from io import BytesIO
-import os
-from dotenv import load_dotenv
-
-# Load environment variables
-load_dotenv()
 
 app = Flask(__name__)
-
-# Konfigurasi database
-if os.environ.get('VERCEL_ENV') == 'production':
-    # Production database (PostgreSQL)
-    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
-else:
-    # Development database (SQLite)
-    basedir = os.path.abspath(os.path.dirname(__file__))
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'keuangan.db')
-
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'rahasia')
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///keuangan.db'
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres.isadrgmnkdggmoqinxiq:arisdevdatabase@aws-0-us-east-1.pooler.supabase.com:6543/postgres'
+app.config['SECRET_KEY'] = 'rahasia'
 db = SQLAlchemy(app)
 
 KATEGORI_PEMASUKAN = [
@@ -431,7 +417,4 @@ def unduh():
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
-    if os.environ.get('VERCEL_ENV') == 'production':
-        app.run()
-    else:
-        app.run(debug=True)
+    app.run(debug=True)
