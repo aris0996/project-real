@@ -1,0 +1,167 @@
+{% extends "base.html" %}
+
+{% block title %}Transaksi - Si Pandai{% endblock %}
+
+{% block content %}
+<div class="card mb-4">
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="card-title mb-0">
+                <i class="fas fa-list me-2"></i>Daftar Transaksi
+            </h5>
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#formTransaksiModal">
+                <i class="fas fa-plus me-2"></i>Tambah Transaksi
+            </button>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Tanggal</th>
+                        <th>Jenis</th>
+                        <th>Kategori</th>
+                        <th>Jumlah</th>
+                        <th>Keterangan</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for t in transaksi %}
+                    <tr>
+                        <td>{{ t.tanggal.strftime('%Y-%m-%d %H:%M') }}</td>
+                        <td>
+                            <span class="badge {% if t.jenis == 'pemasukan' %}bg-success{% else %}bg-danger{% endif %}">
+                                {{ t.jenis|title }}
+                            </span>
+                        </td>
+                        <td>{{ t.kategori }}</td>
+                        <td>Rp {{ "{:,.0f}".format(t.jumlah) }}</td>
+                        <td>{{ t.keterangan or '-' }}</td>
+                        <td>
+                            <a href="{{ url_for('edit_transaksi', id=t.id) }}" class="btn btn-sm btn-warning">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a href="{{ url_for('hapus_transaksi', id=t.id) }}" class="btn btn-sm btn-danger" 
+                               onclick="return confirm('Apakah Anda yakin ingin menghapus transaksi ini?')">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center">Belum ada transaksi</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Tambah Transaksi -->
+<div class="modal fade" id="formTransaksiModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-plus-circle me-2"></i>Tambah Transaksi
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{{ url_for('transaksi') }}" method="post">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Jenis Transaksi</label>
+                        <select name="jenis" class="form-select" id="jenisTransaksi" required onchange="updateKategori()">
+                            <option value="pemasukan">Pemasukan</option>
+                            <option value="pengeluaran">Pengeluaran</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Kategori</label>
+                        <select name="kategori" class="form-select" id="kategoriTransaksi" required>
+                            <optgroup label="Pemasukan" id="kategoriPemasukan">
+                                {% for kategori in kategori_pemasukan %}
+                                <option value="{{ kategori }}">{{ kategori }}</option>
+                                {% endfor %}
+                            </optgroup>
+                            <optgroup label="Pengeluaran" id="kategoriPengeluaran" style="display:none;">
+                                {% for kategori in kategori_pengeluaran %}
+                                <option value="{{ kategori }}">{{ kategori }}</option>
+                                {% endfor %}
+                            </optgroup>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Jumlah</label>
+                        <div class="input-group">
+                            <span class="input-group-text">Rp</span>
+                            <input type="number" name="jumlah" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Keterangan</label>
+                        <textarea name="keterangan" class="form-control" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i>Batal
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-2"></i>Simpan
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+.modal-content {
+    border-radius: 15px;
+    border: none;
+}
+
+.modal-header {
+    background: linear-gradient(135deg, #6c5ce7 0%, #a363d9 100%);
+    color: white;
+    border-radius: 15px 15px 0 0;
+}
+
+.btn-close {
+    filter: brightness(0) invert(1);
+}
+
+.table td, .table th {
+    vertical-align: middle;
+}
+
+.badge {
+    padding: 0.5em 1em;
+}
+</style>
+
+<script>
+function updateKategori() {
+    const jenisSelect = document.getElementById('jenisTransaksi');
+    const kategoriPemasukan = document.getElementById('kategoriPemasukan');
+    const kategoriPengeluaran = document.getElementById('kategoriPengeluaran');
+    
+    if (jenisSelect.value === 'pemasukan') {
+        kategoriPemasukan.style.display = '';
+        kategoriPengeluaran.style.display = 'none';
+        // Set options dalam kategoriPemasukan sebagai available untuk dipilih
+        kategoriPemasukan.querySelectorAll('option').forEach(opt => opt.disabled = false);
+        kategoriPengeluaran.querySelectorAll('option').forEach(opt => opt.disabled = true);
+    } else {
+        kategoriPemasukan.style.display = 'none';
+        kategoriPengeluaran.style.display = '';
+        // Set options dalam kategoriPengeluaran sebagai available untuk dipilih
+        kategoriPemasukan.querySelectorAll('option').forEach(opt => opt.disabled = true);
+        kategoriPengeluaran.querySelectorAll('option').forEach(opt => opt.disabled = false);
+    }
+}
+</script>
+{% endblock %}

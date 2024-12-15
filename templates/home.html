@@ -1,0 +1,664 @@
+{% extends "base.html" %}
+
+{% block title %}Beranda - Si Pandai{% endblock %}
+
+{% block content %}
+<!-- Headline -->
+<div class="card mb-4 border-0 bg-gradient-primary-to-secondary">
+    <div class="card-body p-5">
+        <div class="row align-items-center">
+            <div class="col-lg-7">
+                <h1 class="display-4 fw-bold text-white mb-3">
+                    Kelola Keuangan Anda dengan Lebih Cerdas
+                </h1>
+                <p class="lead text-white-50 mb-4">
+                    Lacak pemasukan, pengeluaran, dan lihat analisis keuangan Anda secara real-time. 
+                    Buat keputusan finansial yang lebih baik dengan data yang terorganisir.
+                </p>
+                <div class="d-flex gap-3">
+                    <a href="{{ url_for('transaksi') }}" class="btn btn-light btn-lg px-4 shadow-sm">
+                        <i class="fas fa-plus me-2"></i>Tambah Transaksi
+                    </a>
+                    <a href="{{ url_for('unduh') }}" class="btn btn-outline-light btn-lg px-4">
+                        <i class="fas fa-download me-2"></i>Unduh Laporan
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-5 d-none d-lg-block text-center">
+                <div class="position-relative">
+                    <div class="position-absolute top-50 start-50 translate-middle">
+                        <i class="fas fa-chart-pie fa-8x text-white opacity-15"></i>
+                    </div>
+                    <img src="/static/pngwing.com.png" style="max-width: 80%;">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tambahkan CSS yang Lebih Baik -->
+<style>
+
+
+
+
+.bg-gradient-primary-to-secondary {
+    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+    border-radius: 20px;
+    box-shadow: 0 10px 20px rgba(99, 102, 241, 0.15);
+}
+
+.display-4 {
+    font-size: 2.75rem;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+}
+
+.lead {
+    font-size: 1.15rem;
+    line-height: 1.6;
+}
+
+.text-white-50 {
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+
+.opacity-15 {
+    opacity: 0.15;
+}
+
+.btn-light {
+    background-color: #fff;
+    border-color: #fff;
+    color: #4f46e5;
+    font-weight: 600;
+    padding: 0.75rem 1.5rem;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+
+.btn-light:hover {
+    background-color: #f8f9fa;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+}
+
+.btn-outline-light {
+    border-width: 2px;
+    font-weight: 600;
+    padding: 0.75rem 1.5rem;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+
+.btn-outline-light:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+}
+
+.shadow-sm {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05) !important;
+}
+
+@media (max-width: 991.98px) {
+    .card-body {
+        padding: 2rem !important;
+    }
+    
+    .display-4 {
+        font-size: 2rem;
+    }
+    
+    .lead {
+        font-size: 1rem;
+    }
+    
+    .btn-lg {
+        padding: 0.5rem 1rem;
+        font-size: 0.95rem;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .d-flex.gap-3 {
+        flex-direction: column;
+        gap: 1rem !important;
+    }
+    
+    .btn-lg {
+        width: 100%;
+        text-align: center;
+    }
+}
+
+/* Style untuk grafik */
+.chart-container {
+    min-height: 300px;
+    margin: 0 -10px;
+}
+
+@media (max-width: 768px) {
+    .chart-container {
+        height: 250px !important;
+        margin: 0 -5px;
+    }
+}
+
+/* Style untuk tombol filter periode */
+.btn-group .btn {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
+}
+
+.btn-outline-primary {
+    border-color: #4e73df;
+    color: #4e73df;
+}
+
+.btn-outline-primary:hover,
+.btn-outline-primary.active {
+    background-color: #4e73df;
+    color: white;
+}
+
+/* Style untuk tombol filter mobile */
+.btn-primary.rounded-circle {
+    width: 56px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s;
+}
+
+.btn-primary.rounded-circle:hover {
+    transform: scale(1.1);
+}
+
+/* Style untuk offcanvas */
+.offcanvas {
+    border-radius: 20px 0 0 20px;
+    box-shadow: -5px 0 25px rgba(0,0,0,0.1);
+}
+
+.offcanvas-header {
+    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+    color: white;
+    padding: 1rem 1.5rem;
+}
+
+.offcanvas-header .btn-close {
+    filter: brightness(0) invert(1);
+}
+
+.offcanvas-body {
+    padding: 1.5rem;
+}
+
+/* Animasi untuk offcanvas */
+.offcanvas.offcanvas-end {
+    transition: transform 0.3s ease-in-out;
+}
+
+@media (max-width: 991.98px) {
+    .offcanvas {
+        width: 300px;
+    }
+}.fa-chart-pie:before, .fa-pie-chart:before {
+    content: none;
+</style>
+
+<!-- Filter Button untuk Mobile -->
+<div class="d-lg-none position-fixed bottom-0 end-0 m-3" style="z-index: 1050;">
+    <button class="btn btn-primary rounded-circle shadow-lg p-3" 
+            data-bs-toggle="offcanvas" 
+            data-bs-target="#filterOffcanvas" 
+            aria-controls="filterOffcanvas">
+        <i class="fas fa-filter fa-lg"></i>
+    </button>
+</div>
+
+<!-- Filter Offcanvas untuk Mobile -->
+<div class="offcanvas offcanvas-end" 
+     tabindex="-1" 
+     id="filterOffcanvas" 
+     aria-labelledby="filterOffcanvasLabel">
+    <div class="offcanvas-header">
+        <h5 class="offcanvas-title" id="filterOffcanvasLabel">
+            <i class="fas fa-filter me-2"></i>Filter Statistik
+        </h5>
+        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+        <form action="{{ url_for('index') }}" method="get">
+            <div class="mb-3">
+                <label class="form-label">Periode</label>
+                <select name="filter" class="form-select">
+                    <option value="semua" {% if filter_aktif == 'semua' %}selected{% endif %}>Semua</option>
+                    <option value="hari" {% if filter_aktif == 'hari' %}selected{% endif %}>Hari Ini</option>
+                    <option value="minggu" {% if filter_aktif == 'minggu' %}selected{% endif %}>Minggu Ini</option>
+                    <option value="bulan" {% if filter_aktif == 'bulan' %}selected{% endif %}>Bulan Ini</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Tanggal Mulai</label>
+                <input type="date" name="start_date" class="form-control" value="{{ start_date or '' }}">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Tanggal Akhir</label>
+                <input type="date" name="end_date" class="form-control" value="{{ end_date or '' }}">
+            </div>
+            <button type="submit" class="btn btn-primary w-100">
+                <i class="fas fa-search me-2"></i>Terapkan Filter
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- Filter Card untuk Desktop -->
+<div class="card mb-4 d-none d-lg-block">
+    <div class="card-body">
+        <h5 class="card-title"><i class="fas fa-filter me-2"></i>Filter Statistik</h5>
+        <form action="{{ url_for('index') }}" method="get" class="row g-3">
+            <div class="col-md-3">
+                <select name="filter" class="form-select">
+                    <option value="semua" {% if filter_aktif == 'semua' %}selected{% endif %}>Semua</option>
+                    <option value="hari" {% if filter_aktif == 'hari' %}selected{% endif %}>Hari Ini</option>
+                    <option value="minggu" {% if filter_aktif == 'minggu' %}selected{% endif %}>Minggu Ini</option>
+                    <option value="bulan" {% if filter_aktif == 'bulan' %}selected{% endif %}>Bulan Ini</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <input type="date" name="start_date" class="form-control" value="{{ start_date or '' }}">
+            </div>
+            <div class="col-md-3">
+                <input type="date" name="end_date" class="form-control" value="{{ end_date or '' }}">
+            </div>
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="fas fa-search me-2"></i>Terapkan Filter
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Ringkasan -->
+<div class="row mb-4">
+    <!-- Total Pemasukan -->
+    <div class="col-md-4">
+        <div class="card border-left-success h-100">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Total Pemasukan</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                            Rp {{ '{:,.0f}'.format(total_pemasukan|default(0)) }}
+                        </div>
+                        <div class="mt-2 text-xs text-success">
+                            {{ '{:.1f}'.format(pemasukan_persentase|default(0)) }}% dari total transaksi
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-arrow-up fa-2x text-success"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Total Pengeluaran -->
+    <div class="col-md-4">
+        <div class="card border-left-danger h-100">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">Total Pengeluaran</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                            Rp {{ '{:,.0f}'.format(total_pengeluaran|default(0)) }}
+                        </div>
+                        <div class="mt-2 text-xs text-danger">
+                            {{ '{:.1f}'.format(pengeluaran_persentase|default(0)) }}% dari total transaksi
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-arrow-down fa-2x text-danger"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Saldo -->
+    <div class="col-md-4">
+        <div class="card border-left-primary h-100">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Saldo</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                            Rp {{ '{:,.0f}'.format(saldo|default(0)) }}
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-wallet fa-2x text-primary"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Ringkasan Statistik -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h6 class="m-0 font-weight-bold text-primary">
+            <i class="fas fa-chart-bar me-2"></i>Ringkasan Statistik
+        </h6>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <!-- Statistik Pemasukan -->
+            <div class="col-lg-6">
+                <h6 class="font-weight-bold">Pemasukan per Kategori</h6>
+                {% for kategori in pemasukan_labels %}
+                <div class="mb-2">
+                    <div class="d-flex justify-content-between small">
+                        <span>{{ kategori }}</span>
+                        <span class="text-success">
+                            {{ '{:,.0f}'.format(pemasukan_data[loop.index0]|default(0)) }}
+                            ({{ '{:.1f}'.format((pemasukan_data[loop.index0] / total_pemasukan * 100) if total_pemasukan > 0 else 0) }}%)
+                        </span>
+                    </div>
+                    <div class="progress" style="height: 5px;">
+                        <div class="progress-bar bg-success" role="progressbar" 
+                             style="width: {{ (pemasukan_data[loop.index0] / total_pemasukan * 100) if total_pemasukan > 0 else 0 }}%">
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Statistik Pengeluaran -->
+            <div class="col-lg-6">
+                <h6 class="font-weight-bold">Pengeluaran per Kategori</h6>
+                {% for kategori in pengeluaran_labels %}
+                <div class="mb-2">
+                    <div class="d-flex justify-content-between small">
+                        <span>{{ kategori }}</span>
+                        <span class="text-danger">
+                            {{ '{:,.0f}'.format(pengeluaran_data[loop.index0]|default(0)) }}
+                            ({{ '{:.1f}'.format((pengeluaran_data[loop.index0] / total_pengeluaran * 100) if total_pengeluaran > 0 else 0) }}%)
+                        </span>
+                    </div>
+                    <div class="progress" style="height: 5px;">
+                        <div class="progress-bar bg-danger" role="progressbar" 
+                             style="width: {{ (pengeluaran_data[loop.index0] / total_pengeluaran * 100) if total_pengeluaran > 0 else 0 }}%">
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Grafik -->
+<div class="row">
+    <!-- Grafik Tren -->
+    <div class="col-xl-8 col-lg-7">
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-chart-line me-2"></i>Tren Keuangan
+                </h6>
+                <div class="btn-group btn-group-sm">
+                    <button type="button" class="btn btn-outline-primary active" data-period="month">Bulanan</button>
+                    <button type="button" class="btn btn-outline-primary" data-period="week">Mingguan</button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="chart-container" style="position: relative; height: 300px; width: 100%;">
+                    <canvas id="trendChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Grafik Kategori -->
+    <div class="col-xl-4 col-lg-5">
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-chart-pie me-2"></i>Kategori
+                </h6>
+                <div class="btn-group btn-group-sm">
+                    <button type="button" class="btn btn-primary active" onclick="showChart('pemasukan')">Pemasukan</button>
+                    <button type="button" class="btn btn-primary" onclick="showChart('pengeluaran')">Pengeluaran</button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="mb-4">
+                    <h6 class="small font-weight-bold">Pemasukan<span class="float-end">{{ '{:.1f}'.format(pemasukan_persentase|default(0)) }}%</span></h6>
+                    <div class="progress">
+                        <div class="progress-bar bg-success" role="progressbar" style="width: {{ pemasukan_persentase|default(0) }}%"></div>
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <h6 class="small font-weight-bold">Pengeluaran<span class="float-end">{{ '{:.1f}'.format(pengeluaran_persentase|default(0)) }}%</span></h6>
+                    <div class="progress">
+                        <div class="progress-bar bg-danger" role="progressbar" style="width: {{ pengeluaran_persentase|default(0) }}%"></div>
+                    </div>
+                </div>
+                <canvas id="categoryChartPemasukan" style="display: block;"></canvas>
+                <canvas id="categoryChartPengeluaran" style="display: none;"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Grafik Tren
+document.addEventListener('DOMContentLoaded', function() {
+    const ctx = document.getElementById('trendChart').getContext('2d');
+    let trendChart;
+
+    // Data untuk grafik
+    const monthlyData = {
+        labels: {{ labels|tojson }},
+        datasets: [{
+            label: 'Pemasukan',
+            data: {{ pemasukan_bulanan|tojson }},
+            borderColor: '#1cc88a',
+            backgroundColor: 'rgba(28, 200, 138, 0.1)',
+            tension: 0.4,
+            fill: true
+        }, {
+            label: 'Pengeluaran',
+            data: {{ pengeluaran_bulanan|tojson }},
+            borderColor: '#e74a3b',
+            backgroundColor: 'rgba(231, 74, 59, 0.1)',
+            tension: 0.4,
+            fill: true
+        }]
+    };
+
+    // Konfigurasi grafik
+    const config = {
+        type: 'line',
+        data: monthlyData,
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: {
+                intersect: false,
+                mode: 'index'
+            },
+            plugins: {
+                legend: {
+                    position: 'top',
+                    labels: {
+                        boxWidth: 10,
+                        usePointStyle: true,
+                        pointStyle: 'circle'
+                    }
+                },
+                tooltip: {
+                    mode: 'index',
+                    intersect: false,
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.dataset.label || '';
+                            if (label) {
+                                label += ': ';
+                            }
+                            if (context.parsed.y !== null) {
+                                label += new Intl.NumberFormat('id-ID', {
+                                    style: 'currency',
+                                    currency: 'IDR'
+                                }).format(context.parsed.y);
+                            }
+                            return label;
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    grid: {
+                        display: false
+                    },
+                    ticks: {
+                        maxRotation: 45,
+                        minRotation: 45,
+                        font: {
+                            size: 10
+                        }
+                    }
+                },
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return new Intl.NumberFormat('id-ID', {
+                                style: 'currency',
+                                currency: 'IDR',
+                                maximumFractionDigits: 0
+                            }).format(value);
+                        },
+                        font: {
+                            size: 10
+                        }
+                    }
+                }
+            }
+        }
+    };
+
+    // Inisialisasi grafik
+    trendChart = new Chart(ctx, config);
+
+    // Fungsi untuk mengupdate grafik berdasarkan periode
+    function updateChart(period) {
+        // Di sini Anda bisa menambahkan logika untuk mengubah data
+        // berdasarkan periode yang dipilih (bulanan/mingguan)
+    }
+
+    // Event listener untuk tombol periode
+    document.querySelectorAll('[data-period]').forEach(button => {
+        button.addEventListener('click', function() {
+            document.querySelectorAll('[data-period]').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            this.classList.add('active');
+            updateChart(this.dataset.period);
+        });
+    });
+
+    // Resize handler
+    function handleResize() {
+        const width = window.innerWidth;
+        if (width < 768) {
+            config.options.scales.x.ticks.maxRotation = 45;
+            config.options.scales.x.ticks.font.size = 8;
+            config.options.scales.y.ticks.font.size = 8;
+        } else {
+            config.options.scales.x.ticks.maxRotation = 45;
+            config.options.scales.x.ticks.font.size = 10;
+            config.options.scales.y.ticks.font.size = 10;
+        }
+        trendChart.update();
+    }
+
+    window.addEventListener('resize', handleResize);
+    handleResize(); // Panggil sekali saat load
+});
+
+// Grafik Kategori Pemasukan
+const categoryCtxPemasukan = document.getElementById('categoryChartPemasukan').getContext('2d');
+new Chart(categoryCtxPemasukan, {
+    type: 'doughnut',
+    data: {
+        labels: {{ pemasukan_labels|tojson }},
+        datasets: [{
+            data: {{ pemasukan_data|tojson }},
+            backgroundColor: {{ colors|tojson }},
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'bottom',
+                display: true
+            }
+        }
+    }
+});
+
+// Grafik Kategori Pengeluaran
+const categoryCtxPengeluaran = document.getElementById('categoryChartPengeluaran').getContext('2d');
+new Chart(categoryCtxPengeluaran, {
+    type: 'doughnut',
+    data: {
+        labels: {{ pengeluaran_labels|tojson }},
+        datasets: [{
+            data: {{ pengeluaran_data|tojson }},
+            backgroundColor: {{ colors|tojson }},
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'bottom',
+                display: true
+            }
+        }
+    }
+});
+
+// Fungsi untuk mengganti tampilan grafik
+function showChart(type) {
+    const pemasukanChart = document.getElementById('categoryChartPemasukan');
+    const pengeluaranChart = document.getElementById('categoryChartPengeluaran');
+    const buttons = document.querySelectorAll('.btn-group .btn');
+    
+    if (type === 'pemasukan') {
+        pemasukanChart.style.display = 'block';
+        pengeluaranChart.style.display = 'none';
+        buttons[0].classList.add('active');
+        buttons[1].classList.remove('active');
+    } else {
+        pemasukanChart.style.display = 'none';
+        pengeluaranChart.style.display = 'block';
+        buttons[0].classList.remove('active');
+        buttons[1].classList.add('active');
+    }
+}
+</script>
+{% endblock %} 
