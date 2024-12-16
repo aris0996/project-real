@@ -3,6 +3,35 @@
 {% block title %}Transaksi - Si Pandai{% endblock %}
 
 {% block content %}
+<!-- Headline Saldo -->
+<div class="card mb-4 border-0 bg-gradient-primary-to-secondary">
+    <div class="card-body p-4">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <div class="d-flex align-items-center mb-3">
+                    <i class="fas fa-wallet fa-2x text-white-50 me-3"></i>
+                    <h2 class="text-white mb-0">Saldo Anda</h2>
+                </div>
+                <h1 class="display-4 fw-bold text-white mb-2">
+                    Rp {{ '{:,.0f}'.format(saldo|default(0)) }}
+                </h1>
+                <p class="lead text-white-50 mb-0">
+                    <i class="fas fa-arrow-up text-success me-2"></i>Pemasukan: Rp {{ '{:,.0f}'.format(total_pemasukan|default(0)) }}
+                    <span class="mx-3">|</span>
+                    <i class="fas fa-arrow-down text-danger me-2"></i>Pengeluaran: Rp {{ '{:,.0f}'.format(total_pengeluaran|default(0)) }}
+                </p>
+            </div>
+            <div class="col-lg-4 d-none d-lg-block text-center">
+                <div class="position-relative">
+                    <div class="position-absolute top-50 start-50 translate-middle">
+                        <i class="fas fa-chart-pie fa-6x text-white opacity-15"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="card mb-4">
     <div class="card-body">
         <div class="d-flex justify-content-between align-items-center mb-3">
@@ -118,6 +147,7 @@
     </div>
 </div>
 
+
 <style>
 .modal-content {
     border-radius: 15px;
@@ -140,6 +170,51 @@
 
 .badge {
     padding: 0.5em 1em;
+}
+
+.bg-gradient-primary-to-secondary {
+    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+    border-radius: 20px;
+    box-shadow: 0 10px 20px rgba(99, 102, 241, 0.15);
+}
+
+.display-4 {
+    font-size: 2.75rem;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+}
+
+.lead {
+    font-size: 1.15rem;
+    line-height: 1.6;
+}
+
+.text-white-50 {
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+
+.opacity-15 {
+    opacity: 0.15;
+}
+
+@media (max-width: 991.98px) {
+    .card-body {
+        padding: 1.5rem !important;
+    }
+    
+    .display-4 {
+        font-size: 2rem;
+    }
+    
+    .lead {
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .display-4 {
+        font-size: 1.75rem;
+    }
 }
 </style>
 

@@ -211,47 +211,59 @@ def get_kategori(jenis):
 @app.route('/transaksi', methods=['GET', 'POST'])
 def transaksi():
     if request.method == 'POST':
-        try:
-            # Ambil data dari form
-            jenis = request.form['jenis']
-            kategori = request.form['kategori']
-            jumlah = float(request.form['jumlah'])
-            keterangan = request.form['keterangan']
-            
-            # Buat transaksi baru
-            transaksi = Transaksi(
-                jenis=jenis,
-                kategori=kategori,
-                jumlah=jumlah,
-                keterangan=keterangan
-            )
-            
-            # Simpan ke database
-            db.session.add(transaksi)
-            db.session.commit()
-            
-            flash('Transaksi berhasil ditambahkan!', 'success')
-            return redirect(url_for('transaksi'))
-            
-        except Exception as e:
-            flash(f'Terjadi kesalahan: {str(e)}', 'error')
-            return redirect(url_for('transaksi'))
+        # Logic untuk menambah transaksi
+        jenis = request.form.get('jenis')
+        kategori = request.form.get('kategori')
+        jumlah = float(request.form.get('jumlah'))
+        keterangan = request.form.get('keterangan')
+        
+        transaksi_baru = Transaksi(
+            tanggal=datetime.now(),
+            jenis=jenis,
+            kategori=kategori,
+            jumlah=jumlah,
+            keterangan=keterangan
+        )
+        
+        db.session.add(transaksi_baru)
+        db.session.commit()
+        
+        flash('Transaksi berhasil ditambahkan!', 'success')
+        return redirect(url_for('transaksi'))
+
+    # Ambil data untuk headline
+    transaksi_list = Transaksi.query.all()
     
-    # Ambil semua transaksi untuk ditampilkan
-    transaksi = Transaksi.query.order_by(Transaksi.tanggal.desc()).all()
+    # Hitung total pemasukan
+    total_pemasukan = sum(t.jumlah for t in transaksi_list if t.jenis == 'pemasukan')
     
-    # Gabungkan kategori default dengan kategori yang sudah ada di database
-    kategori_dari_db = set()
-    for t in transaksi:
-        kategori_dari_db.add(t.kategori)
+    # Hitung total pengeluaran
+    total_pengeluaran = sum(t.jumlah for t in transaksi_list if t.jenis == 'pengeluaran')
     
-    kategori_pemasukan = sorted(set(KATEGORI_PEMASUKAN) | {k for k in kategori_dari_db})
-    kategori_pengeluaran = sorted(set(KATEGORI_PENGELUARAN) | {k for k in kategori_dari_db})
+    # Hitung saldo
+    saldo = total_pemasukan - total_pengeluaran
+
+    # Ambil kategori untuk dropdown
+    kategori_pemasukan = [
+        'Gaji', 'Bonus', 'Investasi', 'Penjualan', 
+        'Hadiah', 'Lain-lain'
+    ]
     
-    return render_template('transaksi.html', 
-                         transaksi=transaksi,
-                         kategori_pemasukan=kategori_pemasukan,
-                         kategori_pengeluaran=kategori_pengeluaran)
+    kategori_pengeluaran = [
+        'Makanan & Minuman', 'Transportasi', 'Belanja', 
+        'Tagihan', 'Hiburan', 'Kesehatan', 'Pendidikan',
+        'Lain-lain'
+    ]
+
+    return render_template(
+        'transaksi.html',
+        transaksi=transaksi_list,
+        saldo=saldo,
+        total_pemasukan=total_pemasukan,
+        total_pengeluaran=total_pengeluaran,
+        kategori_pemasukan=kategori_pemasukan,
+        kategori_pengeluaran=kategori_pengeluaran
+    )
 
 @app.route('/edit_transaksi/<int:id>', methods=['GET', 'POST'])
 def edit_transaksi(id):
