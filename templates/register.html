@@ -1,0 +1,304 @@
+{% extends "base.html" %}
+
+{% block title %}Daftar - Si Pandai{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="text-center mb-4">
+                <div class="brand-logo-lg mb-3">
+                    <i class="fas fa-piggy-bank icon"></i>
+                    <span>Si</span>
+                    <span class="highlight">PANDAI</span>
+                </div>
+                <h4 class="text-muted">Buat Akun Baru</h4>
+                <p class="text-muted small">Mulai perjalanan menuju keuangan yang lebih baik</p>
+            </div>
+
+            <div class="card shadow-lg border-0 rounded-lg">
+                <div class="card-body p-4 p-sm-5">
+                    <form method="POST" class="needs-validation" novalidate>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input class="form-control" id="username" name="username" type="text" 
+                                           placeholder="Username" required pattern="^[a-zA-Z0-9_-]{3,20}$"/>
+                                    <label for="username">Username</label>
+                                    <div class="invalid-feedback">
+                                        Username hanya boleh mengandung huruf, angka, - dan _
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input class="form-control" id="email" name="email" type="email" 
+                                           placeholder="Email" required/>
+                                    <label for="email">Email</label>
+                                    <div class="invalid-feedback">
+                                        Mohon masukkan email yang valid
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-floating mb-3 mt-3">
+                            <input class="form-control" id="nama_lengkap" name="nama_lengkap" type="text" 
+                                   placeholder="Nama Lengkap" required pattern="^[a-zA-Z\s]{3,50}$"/>
+                            <label for="nama_lengkap">Nama Lengkap</label>
+                            <div class="invalid-feedback">
+                                Nama lengkap hanya boleh mengandung huruf dan spasi
+                            </div>
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input class="form-control" id="password" name="password" type="password" 
+                                           placeholder="Password" required minlength="6"
+                                           pattern="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$"/>
+                                    <label for="password">Password</label>
+                                    <div class="invalid-feedback">
+                                        Password minimal 6 karakter, harus mengandung huruf dan angka
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input class="form-control" id="konfirmasi_password" name="konfirmasi_password" 
+                                           type="password" placeholder="Konfirmasi Password" required/>
+                                    <label for="konfirmasi_password">Konfirmasi Password</label>
+                                    <div class="invalid-feedback">
+                                        Password tidak cocok
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-check mb-3 mt-3">
+                            <input class="form-check-input" id="setuju" name="setuju" type="checkbox" required/>
+                            <label class="form-check-label" for="setuju">
+                                Saya setuju dengan <a href="#">Syarat & Ketentuan</a> dan 
+                                <a href="#">Kebijakan Privasi</a>
+                            </label>
+                            <div class="invalid-feedback">
+                                Anda harus menyetujui syarat dan ketentuan
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-user-plus me-2"></i>Daftar Sekarang
+                            </button>
+                            <a href="{{ url_for('login') }}" class="btn btn-light btn-lg">
+                                <i class="fas fa-sign-in-alt me-2"></i>Sudah Punya Akun? Masuk
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="text-center mt-4">
+                <p class="small text-muted">
+                    Dengan mendaftar, Anda menyetujui <a href="#">Syarat & Ketentuan</a> 
+                    dan <a href="#">Kebijakan Privasi</a> kami
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.brand-logo-lg {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem;
+    border-radius: 15px;
+    background: rgba(255, 255, 255, 0.1);
+    margin-bottom: 1rem;
+    animation: fadeInDown 0.5s ease-out;
+}
+
+.brand-logo-lg .icon {
+    font-size: 2.5rem;
+    background: linear-gradient(135deg, #FFD700, #FFA500);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 2px 4px rgba(255, 215, 0, 0.3));
+}
+
+.brand-logo-lg span {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+    font-size: 2rem;
+}
+
+.brand-logo-lg .highlight {
+    background: linear-gradient(135deg, #6c5ce7, #a363d9);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.card {
+    border-radius: 15px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    animation: fadeInUp 0.5s ease-out;
+}
+
+.form-floating > .form-control:focus ~ label,
+.form-floating > .form-control:not(:placeholder-shown) ~ label {
+    color: #4e73df;
+    opacity: 0.8;
+}
+
+.form-control:focus {
+    border-color: #4e73df;
+    box-shadow: 0 0 0 0.25rem rgba(78, 115, 223, 0.25);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+    border: none;
+    font-weight: 600;
+    padding: 0.8rem;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+}
+
+.btn-light {
+    background: #fff;
+    border: 2px solid #e5e7eb;
+    font-weight: 600;
+    padding: 0.8rem;
+    transition: all 0.3s ease;
+}
+
+.btn-light:hover {
+    background: #f9fafb;
+    transform: translateY(-2px);
+}
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Password strength indicator */
+.password-strength {
+    height: 5px;
+    margin-top: 5px;
+    border-radius: 2px;
+    transition: all 0.3s ease;
+}
+
+.password-strength.weak { background-color: #ef4444; width: 33%; }
+.password-strength.medium { background-color: #f59e0b; width: 66%; }
+.password-strength.strong { background-color: #22c55e; width: 100%; }
+
+/* Custom background pattern */
+body {
+    background-color: #f8f9fc;
+    background-image: radial-gradient(#4e73df 0.5px, transparent 0.5px), 
+                      radial-gradient(#4e73df 0.5px, #f8f9fc 0.5px);
+    background-size: 20px 20px;
+    background-position: 0 0, 10px 10px;
+}
+</style>
+
+{% block extra_js %}
+<script>
+// Form validation
+(function () {
+    'use strict'
+    var forms = document.querySelectorAll('.needs-validation')
+    Array.prototype.slice.call(forms).forEach(function (form) {
+        form.addEventListener('submit', function (event) {
+            if (!form.checkValidity()) {
+                event.preventDefault()
+                event.stopPropagation()
+            }
+            
+            // Check if passwords match
+            const password = form.querySelector('#password')
+            const konfirmasi = form.querySelector('#konfirmasi_password')
+            if (password.value !== konfirmasi.value) {
+                konfirmasi.setCustomValidity('Password tidak cocok')
+                event.preventDefault()
+                event.stopPropagation()
+            } else {
+                konfirmasi.setCustomValidity('')
+            }
+            
+            form.classList.add('was-validated')
+        }, false)
+    })
+})()
+
+// Password visibility toggle
+function addPasswordToggle(inputId) {
+    const input = document.getElementById(inputId);
+    const togglePassword = document.createElement('button');
+    togglePassword.type = 'button';
+    togglePassword.className = 'btn btn-link position-absolute end-0 top-50 translate-middle-y text-muted pe-3';
+    togglePassword.innerHTML = '<i class="fas fa-eye"></i>';
+    togglePassword.style.zIndex = '5';
+    
+    input.parentElement.style.position = 'relative';
+    input.parentElement.appendChild(togglePassword);
+    
+    togglePassword.addEventListener('click', function() {
+        const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+        input.setAttribute('type', type);
+        this.innerHTML = type === 'password' ? '<i class="fas fa-eye"></i>' : '<i class="fas fa-eye-slash"></i>';
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    addPasswordToggle('password');
+    addPasswordToggle('konfirmasi_password');
+    
+    // Password strength indicator
+    const password = document.getElementById('password');
+    const strengthIndicator = document.createElement('div');
+    strengthIndicator.className = 'password-strength';
+    password.parentElement.appendChild(strengthIndicator);
+    
+    password.addEventListener('input', function() {
+        const value = this.value;
+        let strength = 0;
+        
+        if (value.length >= 6) strength++;
+        if (value.match(/[A-Z]/)) strength++;
+        if (value.match(/[0-9]/)) strength++;
+        
+        strengthIndicator.className = 'password-strength ' + 
+            (strength === 1 ? 'weak' : strength === 2 ? 'medium' : 'strong');
+    });
+});
+</script>
+{% endblock %}
+{% endblock %} 

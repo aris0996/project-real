@@ -2,6 +2,8 @@ from flask import Flask, render_template, request, redirect, url_for, flash, sen
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime, timedelta
 from collections import defaultdict
+from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
+from werkzeug.security import generate_password_hash, check_password_hash
 
 from sqlalchemy import and_
 from openpyxl import Workbook
@@ -13,6 +15,9 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///keuangan.db'
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres.isadrgmnkdggmoqinxiq:arisdevdatabase@aws-0-us-east-1.pooler.supabase.com:6543/postgres'
 app.config['SECRET_KEY'] = 'rahasia'
 db = SQLAlchemy(app)
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'login'
 
 KATEGORI_PEMASUKAN = [
     'Gaji',
@@ -35,6 +40,89 @@ KATEGORI_PENGELUARAN = [
     'Lainnya'
 ]
 
+class User(UserMixin, db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(80), unique=True, nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    password_hash = db.Column(db.String(128))
+    nama_lengkap = db.Column(db.String(100))
+    tanggal_daftar = db.Column(db.DateTime, default=datetime.utcnow)
+    transaksi = db.relationship('Transaksi', backref='user', lazy=True)
+
+    def set_password(self, password):
+        self.password_hash = generate_password_hash(password)
+
+    def check_password(self, password):
+        return check_password_hash(self.password_hash, password)
+
+@login_manager.user_loader
+def load_user(id):
+    return User.query.get(int(id))
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
+    
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+        remember = 'remember' in request.form
+        
+        user = User.query.filter((User.username == username) | (User.email == username)).first()
+        
+        if user and user.check_password(password):
+            login_user(user, remember=remember)
+            flash('Berhasil masuk!', 'success')
+            next_page = request.args.get('next')
+            return redirect(next_page or url_for('index'))
+        else:
+            flash('Username/email atau password salah', 'danger')
+    
+    return render_template('login.html')
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
+    
+    if request.method == 'POST':
+        username = request.form.get('username')
+        email = request.form.get('email')
+        password = request.form.get('password')
+        konfirmasi_password = request.form.get('konfirmasi_password')
+        nama_lengkap = request.form.get('nama_lengkap')
+        
+        if password != konfirmasi_password:
+            flash('Password tidak cocok', 'danger')
+            return redirect(url_for('register'))
+        
+        if User.query.filter_by(username=username).first():
+            flash('Username sudah digunakan', 'danger')
+            return redirect(url_for('register'))
+            
+        if User.query.filter_by(email=email).first():
+            flash('Email sudah terdaftar', 'danger')
+            return redirect(url_for('register'))
+        
+        user = User(username=username, email=email, nama_lengkap=nama_lengkap)
+        user.set_password(password)
+        
+        db.session.add(user)
+        db.session.commit()
+        
+        flash('Pendaftaran berhasil! Silakan masuk', 'success')
+        return redirect(url_for('login'))
+    
+    return render_template('register.html')
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    flash('Berhasil keluar', 'success')
+    return redirect(url_for('login'))
+
 class Transaksi(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     tanggal = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
@@ -42,8 +130,10 @@ class Transaksi(db.Model):
     kategori = db.Column(db.String(50), nullable=False)
     jumlah = db.Column(db.Float, nullable=False)
     keterangan = db.Column(db.String(200))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
 @app.route('/')
+@login_required
 def index():
     try:
         # Ambil parameter filter
@@ -52,7 +142,7 @@ def index():
         end_date = request.args.get('end_date')
 
         # Query dasar
-        query = Transaksi.query
+        query = Transaksi.query.filter_by(user_id=current_user.id)
 
         # Terapkan filter
         if filter_aktif == 'hari':
@@ -209,6 +299,7 @@ def get_kategori(jenis):
         return jsonify(KATEGORI_PENGELUARAN)
 
 @app.route('/transaksi', methods=['GET', 'POST'])
+@login_required
 def transaksi():
     if request.method == 'POST':
         # Logic untuk menambah transaksi
@@ -222,7 +313,8 @@ def transaksi():
             jenis=jenis,
             kategori=kategori,
             jumlah=jumlah,
-            keterangan=keterangan
+            keterangan=keterangan,
+            user_id=current_user.id
         )
         
         db.session.add(transaksi_baru)
@@ -232,7 +324,7 @@ def transaksi():
         return redirect(url_for('transaksi'))
 
     # Ambil data untuk headline
-    transaksi_list = Transaksi.query.all()
+    transaksi_list = Transaksi.query.filter_by(user_id=current_user.id).all()
     
     # Hitung total pemasukan
     total_pemasukan = sum(t.jumlah for t in transaksi_list if t.jenis == 'pemasukan')
@@ -266,8 +358,9 @@ def transaksi():
     )
 
 @app.route('/edit_transaksi/<int:id>', methods=['GET', 'POST'])
+@login_required
 def edit_transaksi(id):
-    transaksi = Transaksi.query.get_or_404(id)
+    transaksi = Transaksi.query.filter_by(id=id, user_id=current_user.id).first_or_404()
     if request.method == 'POST':
         try:
             transaksi.jenis = request.form['jenis']
@@ -286,9 +379,10 @@ def edit_transaksi(id):
     return render_template('edit_transaksi.html', transaksi=transaksi)
 
 @app.route('/hapus_transaksi/<int:id>')
+@login_required
 def hapus_transaksi(id):
     try:
-        transaksi = Transaksi.query.get_or_404(id)
+        transaksi = Transaksi.query.filter_by(id=id, user_id=current_user.id).first_or_404()
         db.session.delete(transaksi)
         db.session.commit()
         flash('Transaksi berhasil dihapus!', 'success')
@@ -298,6 +392,7 @@ def hapus_transaksi(id):
     return redirect(url_for('transaksi'))
 
 @app.route('/unduh')
+@login_required
 def unduh():
     try:
         wb = Workbook()
@@ -419,7 +514,7 @@ def unduh():
         ws.row_dimensions[5].height = 30
 
         # Data
-        transaksi = Transaksi.query.order_by(Transaksi.tanggal.desc()).all()
+        transaksi = Transaksi.query.filter_by(user_id=current_user.id).order_by(Transaksi.tanggal.desc()).all()
         kategori_pemasukan = defaultdict(float)
         kategori_pengeluaran = defaultdict(float)
         
